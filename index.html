@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Single-cell biology at UCSF: paired chromatin, RNA, protein and spatial data from the same human tissues, and single-cell proteomics by mass spectrometry.">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>singlecell.bio</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Manrope:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: figure-first. Every section is the lab's own published data with a factual caption; one colour per modality. */
+:root{
+  --bg:#f7f9ff; --surface:#ffffff; --fg:#0e1b3a; --muted:#56648a; --line:#dde5f5; --ink:#0a1230;
+  --chrom:#8b5cf6; --rna:#1f6fe8; --prot:#f4532a; --spat:#2fd4a3; --gold:#ffc53d;
+  --display:'Plus Jakarta Sans',system-ui,sans-serif; --body:'Manrope',system-ui,sans-serif;
+  --shadow:0 18px 50px rgba(14,27,58,.10);
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --bg:#0a1230; --surface:#121c42; --fg:#eef3ff; --muted:#a6b3d6; --line:#243160; --ink:#060b1f; --shadow:0 18px 50px rgba(0,0,0,.4); color-scheme:dark } }
+:root[data-theme="dark"]{ --bg:#0a1230; --surface:#121c42; --fg:#eef3ff; --muted:#a6b3d6; --line:#243160; --ink:#060b1f; --shadow:0 18px 50px rgba(0,0,0,.4); color-scheme:dark }
+
+*{box-sizing:border-box}
+body{margin:0;overflow-x:clip;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+img{max-width:100%;display:block}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.08}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.eyebrow{font-family:var(--display);font-weight:700;font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--rna)}
+.lede{color:var(--muted);max-width:52ch;font-size:1.05rem;margin:0}
+section{padding-block:clamp(48px,7vw,96px)}
+.sec-head{display:flex;flex-direction:column;gap:10px;margin-bottom:28px}
+.sec-head h2{font-size:clamp(1.9rem,4.2vw,3rem);font-weight:800;letter-spacing:-.02em}
+
+/* nav */
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;backdrop-filter:blur(14px);background:color-mix(in srgb,var(--bg) 78%,transparent);border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-block:14px}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;font-family:var(--display);font-weight:800;font-size:1.5rem;letter-spacing:-.03em;white-space:nowrap}
+.brand .cell{width:30px;height:30px;border-radius:50%;background:radial-gradient(circle at 38% 36%,var(--prot) 0 28%,transparent 30%),conic-gradient(var(--chrom),var(--rna),var(--spat),var(--prot),var(--chrom));flex:none}
+.brand .tld{color:var(--prot)}
+.brand small{font-family:var(--body);font-weight:700;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-left:6px}
+.links{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.links a{text-decoration:none;font-weight:700;font-size:1.02rem;padding:8px 13px;border-radius:999px;color:var(--muted)}
+.links a:hover,.links a:focus-visible{background:var(--surface);color:var(--fg);outline:none;box-shadow:0 0 0 2px var(--line)}
+@media (max-width:900px){ .links a{font-size:.92rem;padding:8px 9px} .brand small{display:none} }
+
+/* figures */
+figure{margin:0;display:flex;flex-direction:column;gap:10px;min-width:0}
+figure .im{border-radius:16px;overflow:hidden;background:#000;border:1px solid var(--line)}
+figure.light .im{background:#fff}
+figure img{width:100%;height:auto}
+figcaption{font-size:.9rem;color:var(--muted);line-height:1.45}
+figcaption b{color:var(--fg);font-weight:700}
+figcaption .src{display:block;margin-top:4px;font-family:var(--display);font-weight:700;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);opacity:.8}
+
+/* hero */
+.hero{background:var(--ink);color:#eef3ff}
+.hero .wrap{padding-block:clamp(40px,6vw,76px);display:grid;grid-template-columns:1fr 1.35fr;gap:34px;align-items:center}
+.hero .eyebrow{color:var(--gold)}
+.hero h1{font-size:clamp(2.1rem,5vw,3.9rem);font-weight:800;letter-spacing:-.03em;color:#fff}
+.hero h1 em{font-style:normal;color:var(--prot)}
+.hero p{color:#b9c6ea;font-size:1.05rem;max-width:44ch;margin:16px 0 0}
+.hero figure .im{border-color:#243160}
+.hero figcaption{color:#b9c6ea}
+.hero figcaption b{color:#fff}
+.hero figcaption .src{color:#8ea0cc}
+.hero-row{background:var(--ink);padding-bottom:clamp(40px,6vw,72px)}
+.hero-row .wrap{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.hero-row figcaption{color:#b9c6ea}.hero-row figcaption b{color:#fff}.hero-row figcaption .src{color:#8ea0cc}
+.hero-row figure .im{border-color:#243160}
+@media (max-width:900px){ .hero .wrap{grid-template-columns:1fr} .hero-row .wrap{grid-template-columns:1fr} }
+
+/* what we do strip */
+.strip{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.strip a{text-decoration:none;color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:18px 20px;display:flex;flex-direction:column;gap:6px;min-width:0;box-shadow:var(--shadow)}
+.strip a:hover{border-color:var(--prot)}
+.strip .k{font-family:var(--display);font-weight:800;font-size:1.2rem;letter-spacing:-.01em}
+.strip .d{color:var(--muted);font-size:.92rem}
+.strip .go{font-weight:700;color:var(--rna);margin-top:4px}
+@media (max-width:860px){ .strip{grid-template-columns:1fr} }
+
+/* data blocks */
+.tissue{display:grid;grid-template-columns:300px 1fr;gap:26px;align-items:start;padding:24px;border-radius:28px;background:var(--surface);box-shadow:var(--shadow);border:1px solid var(--line)}
+.tissue+.tissue{margin-top:22px}
+.tissue h3{font-size:1.5rem;font-weight:800;letter-spacing:-.015em}
+.tissue .mods{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 14px}
+.chip{font-family:var(--display);font-weight:700;font-size:.72rem;padding:4px 10px;border-radius:999px;color:#fff}
+.nums{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px}
+.nums div b{display:block;font-family:var(--display);font-size:1.45rem;font-weight:800;letter-spacing:-.02em;line-height:1}
+.nums div span{display:block;font-size:.78rem;color:var(--muted);margin-top:4px;line-height:1.3}
+.tissue .figs{display:grid;grid-template-columns:1fr 1fr;gap:16px;min-width:0}
+.tissue .figs.one{grid-template-columns:1fr}
+@media (max-width:900px){ .tissue{grid-template-columns:1fr} .tissue .figs{grid-template-columns:1fr} }
+
+/* generic grids */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.g21{display:grid;grid-template-columns:2fr 1fr;gap:18px}
+.g12{display:grid;grid-template-columns:1fr 2fr;gap:18px}
+@media (max-width:900px){ .g2,.g3,.g21,.g12{grid-template-columns:1fr} }
+.block{margin-top:34px}
+.block h3{font-size:1.35rem;font-weight:800;letter-spacing:-.01em;margin-bottom:6px}
+.block .sub{color:var(--muted);margin:0 0 16px;max-width:70ch}
+.stack{display:flex;flex-direction:column;gap:18px;min-width:0}
+
+/* band tints */
+.prot-band{background:linear-gradient(180deg,#fff1ea,var(--bg))}
+.ai-band{background:linear-gradient(180deg,#ece6ff,var(--bg))}
+.spat-band{background:linear-gradient(180deg,#e6faf3,var(--bg))}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .prot-band{background:linear-gradient(180deg,#2a1830,var(--bg))} :root:not([data-theme="light"]) .ai-band{background:linear-gradient(180deg,#1c1a4a,var(--bg))} :root:not([data-theme="light"]) .spat-band{background:linear-gradient(180deg,#0f3a3a,var(--bg))} }
+:root[data-theme="dark"] .prot-band{background:linear-gradient(180deg,#2a1830,var(--bg))}
+:root[data-theme="dark"] .ai-band{background:linear-gradient(180deg,#1c1a4a,var(--bg))}
+:root[data-theme="dark"] .spat-band{background:linear-gradient(180deg,#0f3a3a,var(--bg))}
+.prot-band .eyebrow{color:var(--prot)} .ai-band .eyebrow{color:var(--chrom)} .spat-band .eyebrow{color:#0ea47a}
+
+/* atlases + papers */
+.atlas{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px}
+.atlas a{text-decoration:none;color:var(--fg);background:var(--surface);box-shadow:var(--shadow);border:1px solid var(--line);border-radius:24px;padding:22px;display:flex;flex-direction:column;gap:8px;min-width:0;transition:transform .3s}
+.atlas a:hover{transform:translateY(-4px);border-color:var(--rna)}
+.atlas .k{font-family:var(--display);font-weight:800;font-size:1.2rem}
+.atlas .d{color:var(--muted);font-size:.92rem}
+.atlas .n{display:flex;gap:14px;flex-wrap:wrap;margin-top:4px}
+.atlas .n b{font-family:var(--display);font-size:1.3rem;font-weight:800;letter-spacing:-.02em;display:block;line-height:1}
+.atlas .n span{display:block;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:3px}
+.atlas .go{margin-top:auto;padding-top:8px;font-weight:700;color:var(--rna)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.papers{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.paper{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:18px 20px;display:flex;flex-direction:column;gap:6px;min-width:0;text-decoration:none;color:var(--fg)}
+.paper:hover{border-color:var(--prot)}
+.paper .j{font-family:var(--display);font-weight:800;font-size:1.15rem}
+.paper .t{font-weight:600;line-height:1.35}
+.paper .a{color:var(--muted);font-size:.85rem}
+footer{border-top:1px solid var(--line);padding-block:40px;color:var(--muted);font-size:.88rem}
+footer .wrap{display:flex;flex-wrap:wrap;gap:24px;justify-content:space-between;align-items:flex-start}
+footer a{text-decoration:none}
+footer a:hover{text-decoration:underline}
+@media (prefers-reduced-motion:reduce){ .atlas a{transition:none} }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="#top"><span class="cell"></span>singlecell<span class="tld">.bio</span><small>Li Lab · UCSF</small></a>
+    <nav class="links">
+      <a href="#data">Data</a>
+      <a href="#technology">Technology</a>
+      <a href="#algorithms">Algorithms</a>
+      <a href="#spatial">Spatial</a>
+      <a href="#atlases">Atlases</a>
+      <a href="#papers">Papers</a>
+      <a href="https://www.complexdisease.org" target="_blank" rel="noopener">Lab</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <div class="hero">
+    <div class="wrap">
+      <div>
+        <div class="eyebrow">Single-cell biology · UCSF</div>
+        <h1>RNA and protein, measured in the <em>same</em> human brain cells.</h1>
+        <p>TBR1 at gestational week 20. Its RNA is in intermediate progenitors and neurons. Its protein is in neurons only. Immunostaining and RNAscope on one section of the same sample show the gap directly.</p>
+      </div>
+      <figure>
+        <div class="im"><img src="figs/nbt4a.jpg" alt="TBR1: reference RNA, paired RNA and paired protein UMAPs beside immunostaining and RNAscope of the same GW20 section" width="815" height="645"></div>
+        <figcaption><b>Reference RNA, paired RNA, paired protein.</b> Same cells, three measurements. In the germinal zone, EOMES protein is present and TBR1 protein is not, while TBR1 RNA is. <span class="src">Wu et al., Nature Biotechnology 2026 · Fig. 4a</span></figcaption>
+      </figure>
+    </div>
+  </div>
+  <div class="hero-row">
+    <div class="wrap">
+      <figure>
+        <div class="im"><img src="figs/nbt4d.jpg" alt="ZBTB18 at GW24: RNA in radial glia, progenitors and neurons; protein in neurons only" loading="lazy" width="815" height="638"></div>
+        <figcaption><b>ZBTB18, GW24.</b> RNA in radial glia, progenitors and neurons; protein in neurons. No ZBTB18 protein in the germinal zone where its RNA is. <span class="src">Wu et al. 2026 · Fig. 4d</span></figcaption>
+      </figure>
+      <figure class="light">
+        <div class="im"><img src="figs/nbt5b.jpg" alt="Scatter of normalized RNA expression versus protein abundance in excitatory neurons" loading="lazy" width="771" height="600"></div>
+        <figcaption><b>Excitatory neurons, gene by gene.</b> 143 genes have low RNA but high protein (blue); 159 have high RNA but low protein (yellow). <span class="src">Wu et al. 2026 · Fig. 5b</span></figcaption>
+      </figure>
+      <figure class="light">
+        <div class="im"><img src="figs/nbt5h.jpg" alt="Tau cell-type specificity scores for RNA versus protein" loading="lazy" width="831" height="582"></div>
+        <figcaption><b>Protein is more cell-type specific than RNA.</b> Tau scores across 2,257 genes, 108 SFARI autism genes, and the two discordant groups. <span class="src">Wu et al. 2026 · Fig. 5h</span></figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <section style="padding-top:clamp(28px,4vw,48px)">
+    <div class="wrap">
+      <div class="strip">
+        <a href="#data"><span class="k">We generate the data</span><span class="d">Hundreds of thousands of nuclei with paired chromatin and RNA; a million cells in place; the largest single-cell proteome of primary human cells.</span><span class="go">Data →</span></a>
+        <a href="#technology"><span class="k">We build the technology</span><span class="d">Label-free mass spectrometry on single developing neurons, one LC-MS run per cell, no amplification.</span><span class="go">Technology →</span></a>
+        <a href="#algorithms"><span class="k">We build the algorithms</span><span class="d">Protein-level quantification and trajectories, integration across samples and modalities, cells mapped back to tissue and to genetic risk.</span><span class="go">Algorithms →</span></a>
+      </div>
+    </div>
+  </section>
+
+  <section id="data" style="padding-top:0">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="eyebrow">Data we generate</div>
+        <h2>Three human tissues, profiled in our lab.</h2>
+        <p class="lede">All samples are primary human tissue. Each dataset is open in the COSMOS browsers below.</p>
+      </div>
+
+      <div class="tissue">
+        <div>
+          <h3>Developing human neocortex</h3>
+          <div class="mods"><span class="chip" style="background:var(--chrom)">snATAC-seq</span><span class="chip" style="background:var(--rna)">snRNA-seq</span><span class="chip" style="background:var(--spat)">MERFISH</span></div>
+          <div class="nums"><div><b>232,328</b><span>nuclei, chromatin and RNA from the same nucleus</span></div><div><b>38</b><span>samples, prefrontal and visual cortex</span></div><div><b>GW10 → 13 y</b><span>five stages, first trimester to adolescence</span></div><div><b>33</b><span>cell types</span></div></div>
+        </div>
+        <div class="figs">
+          <figure class="light"><div class="im"><img src="figs/neo1a.jpg" alt="Sample timeline and nucleus numbers per stage" loading="lazy" width="830" height="541"></div><figcaption><b>Samples by stage and region</b>, with nucleus counts. <span class="src">Wang et al., Nature 2025 · Fig. 1a</span></figcaption></figure>
+          <figure class="light"><div class="im"><img src="figs/neo1b.jpg" alt="UMAP of 33 cell types in the developing neocortex" loading="lazy" width="1336" height="981"></div><figcaption><b>33 cell types</b> in the joint embedding. <span class="src">Wang et al., Nature 2025 · Fig. 1b</span></figcaption></figure>
+        </div>
+      </div>
+
+      <div class="tissue">
+        <div>
+          <h3>Maternal–fetal interface</h3>
+          <div class="mods"><span class="chip" style="background:var(--chrom)">snATAC-seq</span><span class="chip" style="background:var(--rna)">snRNA-seq</span><span class="chip" style="background:var(--spat)">Stereo-seq</span><span class="chip" style="background:var(--spat)">CODEX</span></div>
+          <div class="nums"><div><b>191,735</b><span>nuclei, GW5 to term</span></div><div><b>1,077,690</b><span>cells in place, Stereo-seq, 16 sections</span></div><div><b>19</b><span>cell types, maternal and fetal</span></div><div><b>10</b><span>CODEX protein markers per section</span></div></div>
+        </div>
+        <div class="figs">
+          <figure class="light"><div class="im"><img src="figs/mfi1a.jpg" alt="Cell-type proportions across gestational age groups" loading="lazy" width="1210" height="320"></div><figcaption><b>Composition across gestation</b>: decidual and epithelial cells early, trophoblast at term. <span class="src">Wang et al., Nature 2026 · Fig. 1a</span></figcaption></figure>
+          <figure class="light"><div class="im"><img src="figs/mfi1b.jpg" alt="Epigenome and transcriptome UMAPs of the maternal–fetal interface" loading="lazy" width="877" height="490"></div><figcaption><b>Epigenome and transcriptome</b> of the same nuclei. <span class="src">Wang et al., Nature 2026 · Fig. 1b</span></figcaption></figure>
+        </div>
+      </div>
+
+      <div class="tissue">
+        <div>
+          <h3>Developing brain, single-cell proteome</h3>
+          <div class="mods"><span class="chip" style="background:var(--prot)">Label-free LC-MS</span><span class="chip" style="background:var(--rna)">Paired scRNA-seq</span></div>
+          <div class="nums"><div><b>2,310</b><span>single cells, one mass-spectrometry run each</span></div><div><b>1,505</b><span>brain cells with protein-defined types</span></div><div><b>GW13–19</b><span>telencephalon, germinal zone, cortical plate</span></div><div><b>~2,000</b><span>proteins in the best cells</span></div></div>
+        </div>
+        <div class="figs">
+          <figure><div class="im"><img src="figs/nbt2a.jpg" alt="UMAP of 2,310 cells: brain cells and erythroid cells" loading="lazy" width="555" height="545"></div><figcaption><b>2,310 cells</b>, brain and erythroid. <span class="src">Wu et al. 2026 · Fig. 2a</span></figcaption></figure>
+          <figure><div class="im"><img src="figs/nbt2f.jpg" alt="Proteomics-defined cell types in 1,505 brain cells" loading="lazy" width="975" height="1095"></div><figcaption><b>Cell types defined from protein alone</b>: radial glia, oRG, IPC-EN, EN, CGE-IN, OPC, microglia, vascular. <span class="src">Wu et al. 2026 · Fig. 2f</span></figcaption></figure>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="technology" class="prot-band">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="eyebrow">Technology we build</div>
+        <h2>Single-cell proteomics by mass spectrometry.</h2>
+        <p class="lede">A prenatal neuron is 7 to 10 µm across and holds about 50 pg of protein. There is no amplification step for proteins, so the sample preparation and the instrument have to work at that scale.</p>
+      </div>
+      <div class="g12">
+        <figure class="light">
+          <div class="im"><img src="figs/nbt1a.jpg" alt="Single-cell proteomics workflow from microdissected brain to one LC-MS run per cell" loading="lazy" width="690" height="1508"></div>
+          <figcaption><b>The workflow.</b> Microdissected GW13, GW15 and GW19 cortex, germinal zone and cortical plate; dissociation; FACS into 384-well plates; one label-free LC-MS run per cell; quantitation; analysis. <span class="src">Wu et al. 2026 · Fig. 1a</span></figcaption>
+        </figure>
+        <div class="stack">
+          <div class="g2">
+            <figure class="light"><div class="im"><img src="figs/nbt1b.jpg" alt="Protein number per cell by sample" loading="lazy" width="821" height="800"></div><figcaption><b>Proteins per cell.</b> Up to about 2,000 in GW19 cortical plate cells; empty-well controls near zero. <span class="src">Wu et al. 2026 · Fig. 1b</span></figcaption></figure>
+            <figure class="light"><div class="im"><img src="figs/nbt1c.jpg" alt="Cell number compared with previous single-cell proteomics studies" loading="lazy" width="821" height="688"></div><figcaption><b>Scale.</b> 2,310 primary human neural cells in one dataset, against earlier studies of cell lines, oocytes, cardiomyocytes and hepatocytes. <span class="src">Wu et al. 2026 · Fig. 1c</span></figcaption></figure>
+          </div>
+          <figure><div class="im"><img src="figs/nbt2g.jpg" alt="Twelve marker proteins on the protein-defined cell map" loading="lazy" width="1535" height="532"></div><figcaption><b>Twelve marker proteins</b> on the protein-defined map: HOPX, TNC, EOMES, TBR1, SCGN, CALB2, SIRT2, S100B, P2RY12, PDGFRB, PCNA, MKI67. <span class="src">Wu et al. 2026 · Fig. 2g</span></figcaption></figure>
+          <div class="g2">
+            <figure><div class="im"><img src="figs/nbt4b.jpg" alt="SCGN: RNA and protein in CGE interneurons with VGLUT1 and SCGN immunostaining" loading="lazy" width="660" height="645"></div><figcaption><b>SCGN, GW23.</b> Protein and RNA agree in CGE interneurons; VGLUT1 and SCGN protein in the cortical plate. <span class="src">Wu et al. 2026 · Fig. 4b</span></figcaption></figure>
+            <figure><div class="im"><img src="figs/nbt4c.jpg" alt="TRIM33: RNA and protein with TRIM33 and VGLUT1 immunostaining" loading="lazy" width="672" height="645"></div><figcaption><b>TRIM33, GW23.</b> Protein in neurons of the cortical plate, co-stained with VGLUT1. <span class="src">Wu et al. 2026 · Fig. 4c</span></figcaption></figure>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="algorithms" class="ai-band">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="eyebrow">Algorithms we build</div>
+        <h2>From sparse protein measurements to trajectories, integration and risk.</h2>
+      </div>
+
+      <div class="block">
+        <h3>Trajectories inferred from protein</h3>
+        <p class="sub">Developmental pseudotime from radial glia through intermediate progenitors to excitatory neurons, computed from the proteome, with co-expression modules along it.</p>
+        <div class="g3">
+          <figure class="light"><div class="im"><img src="figs/nbt6a.jpg" alt="RG to EN trajectory inferred from protein" loading="lazy" width="700" height="480"></div><figcaption><b>RG → IPC-EN → EN</b>, proteome-based inference. <span class="src">Wu et al. 2026 · Fig. 6a</span></figcaption></figure>
+          <figure class="light"><div class="im"><img src="figs/nbt6b.jpg" alt="EOMES, TBR1 and ZBTB18 protein abundance along pseudotime" loading="lazy" width="700" height="370"></div><figcaption><b>EOMES, TBR1, ZBTB18</b> protein along pseudotime. <span class="src">Wu et al. 2026 · Fig. 6b</span></figcaption></figure>
+          <figure class="light"><div class="im"><img src="figs/nbt6c.jpg" alt="Six WGCNA protein modules along developmental pseudotime" loading="lazy" width="1053" height="800"></div><figcaption><b>Six protein modules</b> with distinct activity profiles. <span class="src">Wu et al. 2026 · Fig. 6c</span></figcaption></figure>
+        </div>
+        <div class="g2" style="margin-top:18px">
+          <figure class="light"><div class="im"><img src="figs/nbt6h.jpg" alt="Protein module 4 network with genes carrying deleterious mutations in autism highlighted" loading="lazy" width="1043" height="1160"></div><figcaption><b>Module 4, 200 proteins</b>, switches on at the progenitor-to-neuron transition and is enriched for genes with deleterious mutations in autism probands (red). <span class="src">Wu et al. 2026 · Fig. 6h</span></figcaption></figure>
+          <figure class="light"><div class="im"><img src="figs/nbt5c.jpg" alt="Heatmaps of discordant genes across cell types with SFARI annotation" loading="lazy" width="815" height="800"></div><figcaption><b>Discordant genes by cell type.</b> Group A (low RNA, high protein) and group B (high RNA, low protein), with SFARI autism genes marked. <span class="src">Wu et al. 2026 · Fig. 5c</span></figcaption></figure>
+        </div>
+      </div>
+
+      <div class="block">
+        <h3>Integration across samples and modalities</h3>
+        <p class="sub">One embedding for 232,328 nuclei from 38 donors spanning thirteen years, and chromatin, expression and motif activity aligned per cell type.</p>
+        <div class="g12">
+          <figure class="light"><div class="im"><img src="figs/neo1c.jpg" alt="Integrated UMAP coloured by developmental stage and by cortical region" loading="lazy" width="830" height="440"></div><figcaption><b>38 samples in one map</b>, coloured by stage and by region. <span class="src">Wang et al., Nature 2025 · Fig. 1c</span></figcaption></figure>
+          <figure class="light"><div class="im"><img src="figs/neo1e.jpg" alt="Gene expression, chromatin accessibility tracks and motif activity per cell type" loading="lazy" width="1444" height="1067"></div><figcaption><b>Expression, accessibility, motif activity</b> for PAX6, EMX2, EOMES, TBR1, MEF2C, MAF, SOX8 and IRF8 across all cell types. <span class="src">Wang et al., Nature 2025 · Fig. 1e</span></figcaption></figure>
+        </div>
+      </div>
+
+      <div class="block">
+        <h3>Cells mapped back to tissue</h3>
+        <p class="sub">Spatial niches, signed distance to the maternal–fetal interface, and which cell types neighbour which.</p>
+        <div class="g21">
+          <figure class="light"><div class="im"><img src="figs/mfi2cef.jpg" alt="Spatial niches, distance to the maternal-fetal interface, and cell-type composition versus distance" loading="lazy" width="1040" height="460"></div><figcaption><b>Section 016-GW21.</b> Niches; signed distance to the interface in pixels; cell-type composition as a function of that distance, fetal to maternal. <span class="src">Wang et al., Nature 2026 · Fig. 2c, e, f</span></figcaption></figure>
+          <figure class="light"><div class="im"><img src="figs/neo2c.jpg" alt="Neighbourhood enrichment between cell types in infant prefrontal cortex" loading="lazy" width="560" height="530"></div><figcaption><b>Neighbourhood enrichment</b>, infant prefrontal cortex. <span class="src">Wang et al., Nature 2025 · Fig. 2c</span></figcaption></figure>
+        </div>
+      </div>
+
+      <div class="block">
+        <h3>Genetic risk assigned to cells</h3>
+        <p class="sub">Genome-wide association signals from more than 10,000 genomes scored in every cell of the atlas.</p>
+        <div class="g12">
+          <figure class="light"><div class="im"><img src="figs/mfi6a.jpg" alt="Single-cell genetic vulnerability scores on the maternal-fetal interface UMAP" loading="lazy" width="795" height="711"></div><figcaption><b>Single-cell genetic vulnerability scores</b>, fetal cells in blue and maternal cells in red. <span class="src">Wang et al., Nature 2026 · Fig. 6a</span></figcaption></figure>
+          <figure class="light"><div class="im"><img src="figs/mfi6cde.jpg" alt="Enrichment of pre-eclampsia, preterm birth and miscarriage risk across maternal cell types" loading="lazy" width="1600" height="538"></div><figcaption><b>Pre-eclampsia, spontaneous preterm birth, sporadic miscarriage</b>, each mapped to maternal cell types. <span class="src">Wang et al., Nature 2026 · Fig. 6c–e</span></figcaption></figure>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="spatial" class="spat-band">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="eyebrow">Spatial biology</div>
+        <h2>Every cell kept in place.</h2>
+        <p class="lede">Multiplexed protein imaging, sequencing-based whole-transcriptome mapping, and imaging-based transcriptomics, on whole tissue sections.</p>
+      </div>
+
+      <div class="block" style="margin-top:0">
+        <h3>CODEX multiplexed protein imaging</h3>
+        <div class="g21">
+          <figure><div class="im"><img src="figs/mfi3a.jpg" alt="CODEX image of GW15 basal plate with ten markers" loading="lazy" width="1192" height="706"></div><figcaption><b>GW15 basal plate, 10 markers:</b> DAPI, CD31, CK18, CDH1, Ki67, CD206, PDE3A, Vimentin, CD3, PDPN. Spiral arteries, floating and anchoring villi, glands. <span class="src">Wang et al., Nature 2026 · Fig. 3a</span></figcaption></figure>
+          <div class="stack">
+            <figure><div class="im"><img src="figs/mfi3f.jpg" alt="CODEX image of a GW19 spiral artery" loading="lazy" width="951" height="578"></div><figcaption><b>GW19 spiral artery</b> during trophoblast remodelling. <span class="src">Fig. 3f</span></figcaption></figure>
+            <figure><div class="im"><img src="figs/mfi3gi.jpg" alt="CODEX zoom on endothelial states R0 and R2" loading="lazy" width="951" height="524"></div><figcaption><b>Endothelial states R0 and R2</b> resolved by PDE3A and Vimentin. <span class="src">Fig. 3g–i</span></figcaption></figure>
+          </div>
+        </div>
+      </div>
+
+      <div class="block">
+        <h3>Stereo-seq whole-transcriptome spatial sequencing</h3>
+        <div class="stack">
+          <figure class="light"><div class="im"><img src="figs/mfi2a.jpg" alt="Sixteen Stereo-seq sections of the maternal-fetal interface coloured by cell type" loading="lazy" width="1600" height="519"></div><figcaption><b>16 sections, GW18.6 to GW24, 1,077,690 cells</b>, coloured by cell type. <span class="src">Wang et al., Nature 2026 · Fig. 2a</span></figcaption></figure>
+          <div class="g2">
+            <figure><div class="im"><img src="figs/mfi2j.jpg" alt="Stereo-seq section with co-registered Pan-CK and CD31 immunostaining showing EVT around blood vessels" loading="lazy" width="775" height="403"></div><figcaption><b>Stereo-seq with immunostaining on the same section.</b> Extravillous trophoblasts (Pan-CK) lining maternal blood vessels (CD31); HLA-G, NCAM1 and AOC1 transcripts. <span class="src">Fig. 2j</span></figcaption></figure>
+            <figure><div class="im"><img src="figs/mfi2o.jpg" alt="Stereo-seq zoom on endothelial states with PECAM1, PDE3A, VIM and GADD45G" loading="lazy" width="604" height="424"></div><figcaption><b>Endothelial states in transcripts:</b> PECAM1, PDE3A, VIM, GADD45G around a remodelled vessel. <span class="src">Fig. 2o</span></figcaption></figure>
+          </div>
+        </div>
+      </div>
+
+      <div class="block">
+        <h3>MERFISH imaging-based transcriptomics</h3>
+        <figure class="light"><div class="im"><img src="figs/neo2a.jpg" alt="Six MERFISH cortical sections coloured by cell type and by spatial niche" loading="lazy" width="1545" height="699"></div><figcaption><b>Six cortical sections</b>, second trimester to infancy, prefrontal and visual cortex, each shown by cell type and by spatial niche. <span class="src">Wang et al., Nature 2025 · Fig. 2a</span></figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <section id="atlases">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="eyebrow">COSMOS · open atlases</div>
+        <h2>Browse and download every dataset.</h2>
+        <p class="lede">Cellular Omics and Spatial Mapping Of States. Interactive browsers and h5ad files at <a href="https://cell.ucsf.edu" target="_blank" rel="noopener" style="color:var(--rna)">cell.ucsf.edu</a>.</p>
+      </div>
+      <div class="atlas">
+        <a href="https://cell.ucsf.edu/snMultiome/" target="_blank" rel="noopener">
+          <div class="chips"><span class="chip" style="background:var(--chrom)">snATAC</span><span class="chip" style="background:var(--rna)">snRNA</span><span class="chip" style="background:var(--spat)">MERFISH</span></div>
+          <span class="k">Developing human neocortex</span>
+          <span class="d">Gene expression, chromatin tracks and MERFISH sections. Nature 2025.</span>
+          <div class="n"><div><b>232k</b><span>nuclei</span></div><div><b>38</b><span>samples</span></div><div><b>33</b><span>cell types</span></div></div>
+          <span class="go">Open browser →</span>
+        </a>
+        <a href="https://cell.ucsf.edu/snPlacenta/" target="_blank" rel="noopener">
+          <div class="chips"><span class="chip" style="background:var(--chrom)">snATAC</span><span class="chip" style="background:var(--rna)">snRNA</span><span class="chip" style="background:var(--spat)">Stereo-seq</span><span class="chip" style="background:var(--spat)">CODEX</span></div>
+          <span class="k">Maternal–fetal interface</span>
+          <span class="d">Expression, chromatin, CODEX segmentation and Stereo-seq basal plate. Nature 2026.</span>
+          <div class="n"><div><b>192k</b><span>nuclei</span></div><div><b>1.08M</b><span>cells in place</span></div><div><b>GW5 → term</b><span>gestation</span></div></div>
+          <span class="go">Open browser →</span>
+        </a>
+        <a href="https://cell.ucsf.edu/SCProteome/" target="_blank" rel="noopener">
+          <div class="chips"><span class="chip" style="background:var(--prot)">Protein</span><span class="chip" style="background:var(--rna)">scRNA</span></div>
+          <span class="k">Developing brain proteome</span>
+          <span class="d">Single-cell protein abundance with paired transcriptomes, both as h5ad. Nature Biotechnology 2026.</span>
+          <div class="n"><div><b>2,310</b><span>cells</span></div><div><b>1 run</b><span>per cell</span></div><div><b>2</b><span>modalities</span></div></div>
+          <span class="go">Open browser →</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section id="papers" style="padding-top:0">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="eyebrow">Papers</div>
+        <h2>Where the figures come from.</h2>
+      </div>
+      <div class="papers">
+        <a class="paper" href="https://www.nature.com/articles/s41587-025-02980-7" target="_blank" rel="noopener"><span class="j" style="color:var(--prot)">Nature Biotechnology · 2026</span><span class="t">Single-cell proteomic landscape of the developing human brain</span><span class="a">Wu T*, Jiang L*, Mukhtar T, Wang L, Jian R, Wang C, Trinh T, Kriegstein AR, Snyder M, Li J</span></a>
+        <a class="paper" href="https://www.nature.com/articles/s41586-026-10316-x" target="_blank" rel="noopener"><span class="j" style="color:var(--spat)">Nature · 2026</span><span class="t">Single-cell spatiotemporal dissection of the human maternal–fetal interface</span><span class="a">Wang C*, Zhou Y*, Wang YJ* … Fisher SJ, Li J</span></a>
+        <a class="paper" href="https://www.nature.com/articles/s41586-024-08351-7" target="_blank" rel="noopener"><span class="j" style="color:var(--rna)">Nature · 2025</span><span class="t">Molecular and cellular dynamics of the developing human neocortex at single-cell resolution</span><span class="a">Wang L*, Wang C* … Li J, Kriegstein A</span></a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <b style="color:var(--fg)">singlecell.bio</b> is the single-cell program of the <a href="https://www.complexdisease.org" style="color:var(--fg)">Laboratory of Complex Diseases</a>, UCSF.<br>
+      Figures are reproduced from the lab's own open-access papers: Wu et al. 2026 and Wang et al. 2026 (CC BY 4.0), Wang et al. 2025 (CC BY-NC-ND 4.0).
+    </div>
+    <div style="display:flex;gap:14px;flex-wrap:wrap">
+      <a href="https://cell.ucsf.edu" target="_blank" rel="noopener">COSMOS atlases</a>
+      <a href="https://www.complexdisease.org" target="_blank" rel="noopener">Li Lab</a>
+      <a href="https://www.ucsf.edu/" target="_blank" rel="noopener">UCSF</a>
+    </div>
+  </div>
+</footer>
+</body>
+</html>
